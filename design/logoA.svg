@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bgA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f5a78"/>
+      <stop offset="1" stop-color="#16191E"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="58" fill="url(#bgA)"/>
+  <!-- 三条清单项 -->
+  <g stroke-linecap="round">
+    <!-- 勾选圈 + 竹青对勾（已完成） -->
+    <circle cx="74" cy="84" r="15" fill="#4E7A73" opacity="0"/>
+    <path d="M64 84 l7 8 l14 -17" fill="none" stroke="#7FC8A9" stroke-width="8" stroke-linejoin="round"/>
+    <rect x="104" y="79" width="82" height="11" rx="5.5" fill="#F4F6F8" opacity="0.55"/>
+    <!-- 第二条：空心圈 + 文字条 -->
+    <circle cx="74" cy="128" r="12" fill="none" stroke="#F4F6F8" stroke-width="7"/>
+    <rect x="104" y="122" width="82" height="11" rx="5.5" fill="#F4F6F8"/>
+    <!-- 第三条：空心圈 + 短文字条 -->
+    <circle cx="74" cy="172" r="12" fill="none" stroke="#F4F6F8" stroke-width="7"/>
+    <rect x="104" y="166" width="54" height="11" rx="5.5" fill="#F4F6F8"/>
+  </g>
+  <!-- 一点朱火种 -->
+  <circle cx="176" cy="172" r="9" fill="#C05F3C"/>
+</svg>

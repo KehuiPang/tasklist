@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="p3g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a7ca8"/><stop offset="1" stop-color="#274A63"/>
+    </linearGradient>
+  </defs>
+  <!-- 满色底 + 白清单纸 + 靛青勾（学 Microsoft To Do / Things 纸感） -->
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#p3g)"/>
+  <rect x="62" y="58" width="132" height="140" rx="24" fill="#ffffff"/>
+  <g stroke-linecap="round">
+    <path d="M84 106 l11 12 l21 -24" fill="none" stroke="#3fae6a" stroke-width="11" stroke-linejoin="round"/>
+    <line x1="130" y1="106" x2="172" y2="106" stroke="#274A63" stroke-width="10"/>
+    <path d="M84 150 l11 12 l21 -24" fill="none" stroke="#3fae6a" stroke-width="11" stroke-linejoin="round"/>
+    <line x1="130" y1="150" x2="172" y2="150" stroke="#274A63" stroke-width="10"/>
+  </g>
+</svg>

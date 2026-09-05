@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a6b8c"/><stop offset="1" stop-color="#1b2530"/>
+    </linearGradient>
+    <linearGradient id="chk1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6fb894"/><stop offset="1" stop-color="#4e7a63"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="216" height="216" rx="54" fill="url(#g1)"/>
+  <!-- 大对勾在方圆底上，纯粹的"完成"符号 -->
+  <path d="M78 132 l30 32 l70 -78" fill="none" stroke="url(#chk1)" stroke-width="24"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 一点朱火种，勾尾呼吸点 -->
+  <circle cx="78" cy="132" r="11" fill="#C05F3C"/>
+</svg>

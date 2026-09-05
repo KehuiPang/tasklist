@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- 白纸铺满 -->
+  <rect x="20" y="20" width="216" height="216" rx="52" fill="#FCFDFE" stroke="#e4e8ec" stroke-width="2"/>
+  <!-- 顶部靛青夹头（带一点朱做夹扣点睛，克制） -->
+  <rect x="96" y="28" width="64" height="26" rx="13" fill="#274A63"/>
+  <circle cx="128" cy="41" r="5.5" fill="#C05F3C"/>
+  <!-- 清单两行（更简洁大气） -->
+  <g stroke-linecap="round">
+    <path d="M58 112 l14 15 l26 -30" fill="none" stroke="#4E7A63" stroke-width="14" stroke-linejoin="round"/>
+    <rect x="116" y="104" width="84" height="15" rx="7.5" fill="#274A63" opacity="0.85"/>
+    <circle cx="74" cy="168" r="15" fill="none" stroke="#274A63" stroke-width="10"/>
+    <rect x="116" y="160" width="84" height="15" rx="7.5" fill="#274A63" opacity="0.85"/>
+  </g>
+</svg>

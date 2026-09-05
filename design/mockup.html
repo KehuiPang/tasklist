@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>TaskList 设计稿 · 无为 VI</title>
+<link rel="stylesheet" href="mockup.css"/>
+</head>
+<body>
+<div class="page-head">
+  <img class="brandmark" src="logo.svg" alt="logo"/>
+  <div>
+    <h1>TaskList · 任务清单</h1>
+    <div class="sub">常驻第二屏 · 随手记 · 四象限 · 项目树 —— 无为 VI 亮色设计稿</div>
+  </div>
+  <div class="vi-badge">配色 · <b>无为品牌 VI（亮色）</b></div>
+</div>
+
+<div class="gallery">
+
+  <!-- 视图一：列表 -->
+  <div class="stage">
+    <div class="win">
+      <div class="titlebar">
+        <div class="tl-left"><img class="mini-logo" src="logo.svg"/>任务清单</div>
+        <div class="tl-actions">
+          <button class="tb on" title="置顶">📌</button>
+          <button class="tb" title="设置">⚙</button>
+          <button class="tb" title="收起">⇥</button>
+          <button class="tb" title="最小化">—</button>
+        </div>
+      </div>
+      <div class="quick"><div class="inp"><span class="plus">+</span>记点什么… 回车添加</div></div>
+      <div class="toolbar">
+        <div class="tabs"><span class="tab active">列表</span><span class="tab">四象限</span><span class="tab">项目树</span></div>
+        <div class="sort">优先级 ▾</div>
+      </div>
+      <div class="body">
+        <div class="task">
+          <span class="qdot q1"></span><span class="idx">1</span>
+          <span class="chk"></span>
+          <div class="tk-body"><div class="tk-ttl">敲定 TaskList 设计稿，交董事长过审</div>
+            <div class="meta"><span class="tag t-urgent">紧急</span><span class="date">3/5</span><span class="fldr">📁 无为/工具</span></div></div>
+        </div>
+        <div class="task">
+          <span class="qdot q2"></span><span class="idx">2</span>
+          <span class="chk"></span>
+          <div class="tk-body"><div class="tk-ttl">写本周品牌周报</div>
+            <div class="meta"><span class="tag t-high">高</span><span class="date">3/5</span></div></div>
+        </div>
+        <div class="task">
+          <span class="qdot q3"></span><span class="idx">3</span>
+          <span class="chk"></span>
+          <div class="tk-body"><div class="tk-ttl">联系图标供应商确认交付时间</div>
+            <div class="meta"><span class="tag t-mid">中</span><span class="date">3/4</span></div></div>
+        </div>
+        <div class="task done">
+          <span class="qdot q4"></span><span class="idx">4</span>
+          <span class="chk done">✓</span>
+          <div class="tk-body"><div class="tk-ttl">读完无为 VI 视觉规范</div>
+            <div class="meta"><span class="date">3/3</span></div></div>
+        </div>
+        <div class="task done">
+          <span class="qdot q4"></span><span class="idx">5</span>
+          <span class="chk done">✓</span>
+          <div class="tk-body"><div class="tk-ttl">搭好项目骨架</div>
+            <div class="meta"><span class="date">3/3</span></div></div>
+        </div>
+      </div>
+      <div class="defer">▸ 暂缓搁置 (3)</div>
+    </div>
+    <div class="cap"><b>视图 1 · 列表</b> — 象限点 / 序号 / 打钩 / 优先级标签 / 完成划线沉底</div>
+  </div>
+
+  <!-- 视图二：四象限 -->
+  <div class="stage">
+    <div class="win">
+      <div class="titlebar">
+        <div class="tl-left"><img class="mini-logo" src="logo.svg"/>任务清单</div>
+        <div class="tl-actions">
+          <button class="tb on">📌</button><button class="tb">⚙</button><button class="tb">⇥</button><button class="tb">—</button>
+        </div>
+      </div>
+      <div class="quick"><div class="inp"><span class="plus">+</span>记点什么… 回车添加</div></div>
+      <div class="toolbar">
+        <div class="tabs"><span class="tab">列表</span><span class="tab active">四象限</span><span class="tab">项目树</span></div>
+        <div class="sort">优先级 ▾</div>
+      </div>
+      <div class="body">
+        <div class="quad">
+          <div class="qcell"><h4><span class="qh q1"></span>① 重要且紧急</h4>
+            <div class="qitem"><span class="qc"></span>交设计稿过审</div>
+            <div class="qitem"><span class="qc"></span>修复线上 bug</div>
+          </div>
+          <div class="qcell"><h4><span class="qh q2"></span>② 重要不紧急</h4>
+            <div class="qitem"><span class="qc"></span>规划下季度路线</div>
+            <div class="qitem"><span class="qc"></span>学习新框架</div>
+          </div>
+          <div class="qcell"><h4><span class="qh q3"></span>③ 紧急不重要</h4>
+            <div class="qitem"><span class="qc"></span>回复邮件</div>
+            <div class="qitem done"><span class="qc done"></span>订会议室</div>
+          </div>
+          <div class="qcell"><h4><span class="qh q4"></span>④ 都不</h4>
+            <div class="qitem"><span class="qc"></span>整理收藏夹</div>
+          </div>
+        </div>
+      </div>
+      <div class="defer">▸ 暂缓搁置 (3)</div>
+    </div>
+    <div class="cap"><b>视图 2 · 四象限</b> — 重要紧急 2×2；紧急=一点朱，其余靛青/暖金/灰</div>
+  </div>
+
+  <!-- 视图三：项目树 -->
+  <div class="stage">
+    <div class="win">
+      <div class="titlebar">
+        <div class="tl-left"><img class="mini-logo" src="logo.svg"/>任务清单</div>
+        <div class="tl-actions">
+          <button class="tb on">📌</button><button class="tb">⚙</button><button class="tb">⇥</button><button class="tb">—</button>
+        </div>
+      </div>
+      <div class="quick"><div class="inp"><span class="plus">+</span>记点什么… 回车添加</div></div>
+      <div class="toolbar">
+        <div class="tabs"><span class="tab">列表</span><span class="tab">四象限</span><span class="tab active">项目树</span></div>
+        <div class="sort">手动 ▾</div>
+      </div>
+      <div class="body">
+        <div class="crumb"><a>🏠 全部</a> / <a>无为项目</a></div>
+        <div class="addf"><div class="fi">新建子目录 / 职能模块…</div><div class="fb">+ 目录</div></div>
+        <div class="trow"><span class="fico">📁</span><span class="fname">研发</span><span class="fc">8</span></div>
+        <div class="trow"><span class="fico">📁</span><span class="fname">设计</span><span class="fc">3</span></div>
+        <div class="trow"><span class="fico">📁</span><span class="fname">运营推广</span><span class="fc">5</span></div>
+        <div class="task">
+          <span class="qdot q2"></span><span class="idx">1</span><span class="chk"></span>
+          <div class="tk-body"><div class="tk-ttl">本级直挂的任务也能显示</div>
+            <div class="meta"><span class="tag t-mid">中</span><span class="date">3/5</span></div></div>
+        </div>
+      </div>
+      <div class="defer">▸ 暂缓搁置 (3)</div>
+    </div>
+    <div class="cap"><b>视图 3 · 项目树</b> — 多级目录 + 面包屑，目录下挂清单</div>
+  </div>
+
+  <!-- 收起态 + 托盘 -->
+  <div class="stage">
+    <div class="collapsed-demo">
+      <div class="desktop-hint">← 贴到屏幕右边缘<br/>自动收成细条<br/><br/>鼠标移过去<br/>平滑展开</div>
+      <div class="strip"><span class="spark"></span></div>
+    </div>
+    <div class="cap"><b>贴边收起态</b> — 玄墨→靛青渐变细条，中间一点朱火种</div>
+    <div class="tray" style="margin-top:20px">
+      <div class="mi"><span class="ic">◐</span>显示 / 展开</div>
+      <div class="mi"><span class="ic">📌</span>置顶开关</div>
+      <div class="sep"></div>
+      <div class="mi quit"><span class="ic">⏻</span>退出</div>
+    </div>
+    <div class="cap"><b>托盘右键菜单</b> — 圆相图标，右键弹出，含退出</div>
+  </div>
+
+</div>
+</body>
+</html>

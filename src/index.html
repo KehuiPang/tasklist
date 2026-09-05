@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskList</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 收起后显示的小竖条 -->
+  <div id="collapsedStrip" class="collapsed-strip hidden">
+    <span class="strip-icon">✓</span>
+  </div>
+
+  <div id="app" class="app">
+    <!-- 标题栏（可拖动） -->
+    <div class="titlebar" id="titlebar">
+      <div class="title-left">
+        <img class="logo-svg" src="logo.svg" alt="" />
+        <span class="title-text">任务清单</span>
+      </div>
+      <div class="title-actions">
+        <button class="tb-btn" id="btnPin" title="置顶">📌</button>
+        <button class="tb-btn" id="btnSettings" title="设置">⚙</button>
+        <button class="tb-btn" id="btnCollapse" title="贴边收起">⇥</button>
+        <button class="tb-btn" id="btnMin" title="最小化到托盘">—</button>
+      </div>
+    </div>
+
+    <!-- 快速记录 -->
+    <div class="quick-add">
+      <input type="text" id="quickInput" placeholder="记点什么… 回车添加" autocomplete="off" />
+    </div>
+
+    <!-- 工具条：视图 + 排序 -->
+    <div class="toolbar">
+      <div class="view-tabs">
+        <button class="vtab active" data-view="list">列表</button>
+        <button class="vtab" data-view="quadrant">四象限</button>
+        <button class="vtab" data-view="tree">项目树</button>
+      </div>
+      <div class="sort-box">
+        <select id="sortSelect" title="排序">
+          <option value="priority">优先级</option>
+          <option value="date">日期</option>
+          <option value="manual">手动</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 面包屑（项目树用） -->
+    <div class="breadcrumb hidden" id="breadcrumb"></div>
+
+    <!-- 主内容 -->
+    <div class="content" id="content"></div>
+
+    <!-- 搁置区展开条 -->
+    <div class="deferred-bar" id="deferredBar">
+      <span id="deferredToggle">▸ 暂缓搁置 (<span id="deferredCount">0</span>)</span>
+    </div>
+    <div class="deferred-list hidden" id="deferredList"></div>
+  </div>
+
+  <!-- 设置面板 -->
+  <div class="modal hidden" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span>设置</span>
+        <button class="tb-btn" id="btnCloseSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="set-row">
+          <label>默认组织方式</label>
+          <select id="setViewMode">
+            <option value="list">列表</option>
+            <option value="quadrant">四象限</option>
+            <option value="tree">项目树</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>默认排序</label>
+          <select id="setSortBy">
+            <option value="priority">优先级</option>
+            <option value="date">日期</option>
+            <option value="manual">手动</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>贴边方向</label>
+          <select id="setEdge">
+            <option value="right">右边</option>
+            <option value="left">左边</option>
+            <option value="top">顶部</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>贴边自动收起</label>
+          <input type="checkbox" id="setAutoHide" />
+        </div>
+        <div class="set-row">
+          <label>窗口置顶</label>
+          <input type="checkbox" id="setAlwaysOnTop" />
+        </div>
+        <hr />
+        <div class="set-row">
+          <label>数据备份</label>
+          <div>
+            <button class="mini-btn" id="btnExport">导出</button>
+            <button class="mini-btn" id="btnImport">导入</button>
+          </div>
+        </div>
+        <div class="set-hint">数据保存在本地：userData/tasklist-data.json</div>
+        <hr />
+        <div class="set-row">
+          <button class="danger-btn" id="btnQuit">退出程序</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 任务编辑弹层 -->
+  <div class="modal hidden" id="taskModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <span id="taskModalTitle">编辑任务</span>
+        <button class="tb-btn" id="btnCloseTask">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="set-row col">
+          <label>标题</label>
+          <input type="text" id="editTitle" />
+        </div>
+        <div class="set-row">
+          <label>四象限</label>
+          <select id="editQuadrant">
+            <option value="">无</option>
+            <option value="IU">① 重要且紧急</option>
+            <option value="IN">② 重要不紧急</option>
+            <option value="NU">③ 紧急不重要</option>
+            <option value="NN">④ 不重要不紧急</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>优先级</label>
+          <select id="editPriority">
+            <option value="3">紧急</option>
+            <option value="2">高</option>
+            <option value="1">中</option>
+            <option value="0">低</option>
+          </select>
+        </div>
+        <div class="set-row">
+          <label>所属目录</label>
+          <select id="editFolder"></select>
+        </div>
+        <div class="set-row">
+          <button class="mini-btn" id="btnDeferTask">搁置</button>
+          <button class="mini-btn" id="btnActivateTask">恢复待办</button>
+          <button class="danger-btn" id="btnDeleteTask">删除</button>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="primary-btn" id="btnSaveTask">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

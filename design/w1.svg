@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- 白纸铺满整个图标 -->
+  <rect x="20" y="20" width="216" height="216" rx="52" fill="#FCFDFE" stroke="#e4e8ec" stroke-width="2"/>
+  <!-- 顶部靛青夹头 -->
+  <rect x="98" y="30" width="60" height="26" rx="13" fill="#274A63"/>
+  <!-- 清单三行 -->
+  <g stroke-linecap="round">
+    <!-- 第一行：竹青对勾 + 长条 -->
+    <path d="M56 106 l12 13 l22 -26" fill="none" stroke="#4E7A63" stroke-width="12" stroke-linejoin="round"/>
+    <rect x="108" y="99" width="88" height="14" rx="7" fill="#274A63" opacity="0.85"/>
+    <!-- 第二行：靛青空心圈 + 长条 -->
+    <circle cx="70" cy="152" r="13" fill="none" stroke="#274A63" stroke-width="9"/>
+    <rect x="108" y="145" width="88" height="14" rx="7" fill="#274A63" opacity="0.85"/>
+    <!-- 第三行：靛青空心圈 + 短条 -->
+    <circle cx="70" cy="198" r="13" fill="none" stroke="#274A63" stroke-width="9"/>
+    <rect x="108" y="191" width="60" height="14" rx="7" fill="#274A63" opacity="0.85"/>
+  </g>
+</svg>

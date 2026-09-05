@@ -1,0 +1,67 @@
+{
+  "name": "tasklist",
+  "version": "1.0.0",
+  "description": "常驻第二屏的个人任务清单管理软件",
+  "main": "src/main.js",
+  "author": "KehuiPang",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KehuiPang/tasklist.git"
+  },
+  "homepage": "https://github.com/KehuiPang/tasklist#readme",
+  "bugs": {
+    "url": "https://github.com/KehuiPang/tasklist/issues"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.wuwei.tasklist",
+    "productName": "TaskList",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "build/tray-16.png",
+      "build/tray-24.png",
+      "build/tray-32.png",
+      "build/winicon-16.png",
+      "build/winicon-32.png",
+      "build/winicon-48.png",
+      "build/winicon-64.png",
+      "build/winicon-128.png",
+      "build/winicon-256.png",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "KehuiPang",
+      "repo": "tasklist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TaskList"
+    }
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}
