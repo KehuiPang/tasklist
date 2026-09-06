@@ -8,9 +8,11 @@
 
 轻量 · 本地存储 · 浅色清爽 · 贴边自动收起
 
+**简体中文** · [English](README.en.md)
+
 [![Release](https://img.shields.io/github/v/release/KehuiPang/tasklist?display_name=tag)](https://github.com/KehuiPang/tasklist/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-274a63.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-274a63.svg)](https://github.com/KehuiPang/tasklist/releases)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-274a63.svg)](https://github.com/KehuiPang/tasklist/releases)
 [![Built with Electron](https://img.shields.io/badge/Electron-32-1b2530.svg)](https://www.electronjs.org/)
 
 </div>
@@ -61,15 +63,22 @@ TaskList 是一款**为个人日常打造的桌面待办清单**。它默认贴�
 
 ## 截图
 
-> 主界面（列表 / 四象限 / 项目树）、贴边收起效果、托盘菜单。
->
-> _（可在此处放置截图）_
+<div align="center">
+
+| 列表 | 四象限 | 项目树 |
+|:---:|:---:|:---:|
+| <img src="design/screenshots/list-zh.png" width="240" alt="列表视图" /> | <img src="design/screenshots/matrix-zh.png" width="240" alt="四象限视图" /> | <img src="design/screenshots/tree-zh.png" width="240" alt="项目树视图" /> |
+| 一条条排下来，完成打勾划线沉底 | 重要紧急矩阵，分清轻重缓急 | 项目 + 多级目录，层层归纳 |
+
+</div>
 
 ## 下载安装
 
-前往 [**Releases 页面**](https://github.com/KehuiPang/tasklist/releases) 下载最新的 `TaskList-Setup-x.x.x.exe`，双击安装即可。
+前往 [**Releases 页面**](https://github.com/KehuiPang/tasklist/releases) 下载适合你系统的最新安装包：
 
-> 目前提供 **Windows x64** 安装包。安装时可自定义安装目录、自动创建桌面与开始菜单快捷方式。
+- **Windows** — `TaskList-Setup-x.x.x.exe`
+- **macOS** — `.dmg`（Intel 与 Apple Silicon 双架构）
+- **Linux** — `.AppImage` / `.deb`
 
 ## 从源码运行 / 构建
 
@@ -98,7 +107,9 @@ npm run dist
 所有任务数据保存在本机用户目录下的单个 JSON 文件：
 
 ```
-%APPDATA%\tasklist\tasklist-data.json
+Windows   %APPDATA%\tasklist\tasklist-data.json
+macOS     ~/Library/Application Support/tasklist/tasklist-data.json
+Linux     ~/.config/tasklist/tasklist-data.json
 ```
 
 想备份或迁移，直接复制这个文件即可；也可以用软件内的「导出 / 导入」功能。
@@ -121,6 +132,7 @@ npm run dist
 - ✅ 贴边自动收起 + 悬停展开
 - ✅ 浅色清爽界面、系统托盘、导入导出
 - ✅ 本地 JSON 存储
+- ✅ 中文 / English 双语（应用内可切换）
 
 版本更新记录见 [Releases](https://github.com/KehuiPang/tasklist/releases)。
 
