@@ -17,3 +17,8 @@ Thumbs.db
 
 # 本地数据（用户数据存在 userData，不入库）
 tasklist-data.json
+my-tasks-backup.json
+
+# 截图/设计临时脚本（_ 前缀）
+design/_*.js
+design/_*.html

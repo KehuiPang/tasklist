@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<title>TaskList shot</title>
+<link rel="stylesheet" href="../src/styles.css"/>
+<style>
+  /* 截图专用：品牌色柔和渐变背景 + 居中窗口卡片 */
+  html,body{ overflow:visible; }
+  #bg{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:48px 40px;
+    /* 中性月白/浅灰底，衬托浅色应用，不带色相 */
+    background: linear-gradient(160deg, #f2f4f6 0%, #e6e9ec 100%);
+  }
+  #frame{
+    width:352px; height:560px; border-radius:14px; overflow:hidden;
+    box-shadow:0 12px 44px rgba(22,25,30,.16), 0 2px 8px rgba(22,25,30,.08);
+    border:1px solid var(--border);
+  }
+  .app{ height:560px; }
+</style>
+</head>
+<body>
+<div id="bg">
+<div id="frame">
+  <div class="app">
+    <div class="titlebar">
+      <div class="title-left">
+        <img class="logo-svg" src="../src/logo.svg" alt=""/>
+        <span class="title-text" id="i_title">任务清单</span>
+      </div>
+      <div class="title-actions">
+        <button class="tb-btn active">📌</button>
+        <button class="tb-btn">⚙</button>
+        <button class="tb-btn">⇥</button>
+        <button class="tb-btn">—</button>
+      </div>
+    </div>
+    <div class="quick-add"><input type="text" id="i_quick" placeholder="记点什么… 回车添加"/></div>
+    <div class="toolbar">
+      <div class="view-tabs" id="tabs"></div>
+      <div class="sort-box"><select id="i_sort"><option></option></select></div>
+    </div>
+    <div class="breadcrumb hidden" id="breadcrumb"></div>
+    <div class="content" id="content"></div>
+    <div class="deferred-bar"><span>▸ <span id="i_defer">暂缓搁置</span> (3)</span></div>
+  </div>
+</div>
+</div>
+
+<script src="../src/i18n.js"></script>
+<script>
+const P = new URLSearchParams(location.search);
+const VIEW = P.get('view') || 'list';   // list | quadrant | tree
+const LANG = P.get('lang') || 'zh-CN';  // zh-CN | en
+setLang(LANG);
+document.documentElement.lang = LANG;
+
+// 示范数据
+const DEMO = {
+  'zh-CN': {
+    tasks: [
+      { q:'IU', prio:3, title:'敲定产品设计稿，交负责人过审', date:'3/5', folder:'工作/产品' },
+      { q:'IN', prio:2, title:'规划下季度路线图', date:'3/5', folder:'' },
+      { q:'NU', prio:1, title:'回复合作方邮件', date:'3/4', folder:'' },
+      { q:'IN', prio:2, title:'读完《原子习惯》第 3 章', date:'3/4', folder:'成长' },
+      { q:'NN', prio:0, title:'整理浏览器收藏夹', date:'3/3', done:true },
+      { q:'NN', prio:0, title:'搭好项目骨架', date:'3/3', done:true },
+    ],
+    quad: {
+      IU:[['交设计稿过审',0],['修复线上 bug',0]],
+      IN:[['规划下季度路线',0],['学习新框架',0]],
+      NU:[['回复邮件',0],['预订会议室',1]],
+      NN:[['整理收藏夹',0]],
+    },
+    folders:[['研发',8],['设计',3],['运营推广',5]],
+    crumb:['🏠 全部','无为项目'],
+    addf:'新建子目录 / 职能模块…',
+    treeTask:'本级直挂的任务也能显示',
+  },
+  'en': {
+    tasks: [
+      { q:'IU', prio:3, title:'Finalize product spec & send for review', date:'3/5', folder:'Work/Product' },
+      { q:'IN', prio:2, title:'Plan next quarter roadmap', date:'3/5', folder:'' },
+      { q:'NU', prio:1, title:'Reply to partner email', date:'3/4', folder:'' },
+      { q:'IN', prio:2, title:'Finish Chapter 3 of Atomic Habits', date:'3/4', folder:'Growth' },
+      { q:'NN', prio:0, title:'Tidy up browser bookmarks', date:'3/3', done:true },
+      { q:'NN', prio:0, title:'Scaffold the project', date:'3/3', done:true },
+    ],
+    quad: {
+      IU:[['Send design for review',0],['Fix production bug',0]],
+      IN:[['Plan next roadmap',0],['Learn a new framework',0]],
+      NU:[['Reply to emails',0],['Book meeting room',1]],
+      NN:[['Clean up bookmarks',0]],
+    },
+    folders:[['Engineering',8],['Design',3],['Growth & Ops',5]],
+    crumb:['🏠 All','My Project'],
+    addf:'New subfolder / module…',
+    treeTask:'Tasks pinned to this level show here too',
+  },
+};
+const D = DEMO[LANG];
+
+// 顶部静态文案
+document.getElementById('i_title').textContent = t('appTitle');
+// 截图里 placeholder 用简短版，避免英文被框宽截断
+document.getElementById('i_quick').placeholder = (LANG==='en') ? 'Jot something down…' : t('quick_ph');
+document.getElementById('i_defer').textContent = t('deferred_bar');
+// 视图 tab
+const tabs = [['list','view_list'],['quadrant','view_quadrant'],['tree','view_tree']];
+document.getElementById('tabs').innerHTML = tabs.map(([v,k])=>
+  `<button class="vtab ${v===VIEW?'active':''}">${t(k)}</button>`).join('');
+// 排序下拉
+document.getElementById('i_sort').innerHTML =
+  `<option>${VIEW==='tree'?t('sort_manual'):t('sort_priority')}</option>`;
+
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const PRIO = {3:t('prio_3'),2:t('prio_2'),1:t('prio_1'),0:t('prio_0')};
+
+function taskHtml(tk, idx){
+  const q = tk.q ? `<span class="qdot q-${tk.q}"></span>` : '';
+  const prio = `<span class="tag prio-${tk.prio}">${PRIO[tk.prio]}</span>`;
+  const fld = tk.folder ? `<span class="date">📁${tk.folder}</span>` : '';
+  return `<div class="task ${tk.done?'done':''}">
+    ${q}<span class="idx">${idx}</span>
+    <span class="check">${tk.done?'✓':''}</span>
+    <div class="body"><div class="ttl">${esc(tk.title)}</div>
+      <div class="meta">${prio}<span class="date">${tk.date}</span>${fld}</div></div>
+  </div>`;
+}
+
+const content = document.getElementById('content');
+const bc = document.getElementById('breadcrumb');
+
+if (VIEW==='list'){
+  content.innerHTML = D.tasks.map((tk,i)=>taskHtml(tk,i+1)).join('');
+} else if (VIEW==='quadrant'){
+  const cells = ['IU','IN','NU','NN'].map(qk=>{
+    const items = D.quad[qk].map(([txt,done])=>
+      `<div class="qtask ${done?'done':''}"><span class="qcheck"></span><span>${esc(txt)}</span></div>`).join('');
+    return `<div class="quad-cell"><h4><span class="qh-dot q-${qk}"></span>${t('q_'+qk)}</h4>${items}</div>`;
+  }).join('');
+  content.innerHTML = `<div class="quad-grid">${cells}</div>`;
+} else if (VIEW==='tree'){
+  bc.classList.remove('hidden');
+  bc.innerHTML = D.crumb.map((c,i)=> i? ` / <a>${c}</a>`:`<a>${c}</a>`).join('');
+  let html = `<div class="add-folder-row"><input type="text" placeholder="${D.addf}"/><button class="mini-btn">${t('btn_addfolder')}</button></div>`;
+  html += D.folders.map(([n,c])=>`<div class="tree-item">
+    <span class="fico">📁</span><span class="fname">${esc(n)}</span><span class="fcount">${c}</span>
+    <span class="tree-actions"><button class="tb-btn">✎</button><button class="tb-btn">🗑</button></span>
+  </div>`).join('');
+  html += taskHtml({q:'IN',prio:1,title:D.treeTask,date:'3/5',folder:''},1);
+  content.innerHTML = html;
+}
+</script>
+</body>
+</html>
