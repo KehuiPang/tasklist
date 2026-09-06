@@ -8,20 +8,23 @@
   <g>
     <!-- 渐变直角方块铺满（圆角由 round_mask.py 精确套上，保证四角对称） -->
     <rect x="0" y="0" width="256" height="256" fill="url(#g4)"/>
-    <!-- 夹头 -->
-    <rect x="103" y="50" width="50" height="23" rx="10" fill="#cdd6dd"/>
-    <!-- 纸面：宽128 高144，垂直居中(y 56→200, 中心128=画布中心) -->
-    <rect x="64" y="56" width="128" height="144" rx="24" fill="#F4F6F8"/>
-    <!-- 纸上清单：一个青勾 + 两行(圈+条)，随纸面等比重排 -->
-    <g stroke-linecap="round">
-      <path d="M83 100 l11 12 l21 -25" fill="none" stroke="#4e7a63" stroke-width="11" stroke-linejoin="round"/>
-      <rect x="128" y="96" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.5"/>
-      <circle cx="94" cy="142" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
-      <rect x="128" y="136" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
-      <circle cx="94" cy="176" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
-      <rect x="128" y="170" width="32" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
+    <!-- 整个剪贴板图形上移居中 + 以画布中心放大 1.12 倍 -->
+    <g transform="translate(123,116) scale(1.24) translate(-128,-128)">
+      <!-- 夹头 -->
+      <rect x="103" y="50" width="50" height="23" rx="10" fill="#cdd6dd"/>
+      <!-- 纸面 -->
+      <rect x="64" y="56" width="128" height="144" rx="24" fill="#F4F6F8"/>
+      <!-- 纸上清单：一个青勾 + 两行(圈+条) -->
+      <g stroke-linecap="round">
+        <path d="M83 100 l11 12 l21 -25" fill="none" stroke="#4e7a63" stroke-width="11" stroke-linejoin="round"/>
+        <rect x="128" y="96" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.5"/>
+        <circle cx="94" cy="142" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
+        <rect x="128" y="136" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
+        <circle cx="94" cy="176" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
+        <rect x="128" y="170" width="32" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
+      </g>
+      <!-- 夹头一点朱火种 -->
+      <circle cx="128" cy="61" r="8" fill="#C05F3C"/>
     </g>
-    <!-- 夹头一点朱火种 -->
-    <circle cx="128" cy="61" r="8" fill="#C05F3C"/>
   </g>
 </svg>
