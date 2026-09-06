@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="build/winicon-256.png" width="112" alt="TaskList" />
+<img src="build/winicon-256.png?v=2" width="112" alt="TaskList" />
 
 # TaskList · 任务清单
 
@@ -21,7 +21,7 @@
 
 ## 这是什么
 
-TaskList 是一款**为个人日常打造的桌面待办清单**。它默认贴在屏幕边缘常驻——鼠标一碰就展开、移开自动收起，不占地方又随时可用。适合放在第二块屏幕上，把脑子里的事随手记下来，按重要/紧急分类，做完打勾划线沉底，一目了然。
+TaskList 是一款**为个人日常打造的桌面待办清单**。它默认贴在屏幕边缘常驻：鼠标一碰就展开、移开自动收起，不占地方又随时可用。适合放在第二块屏幕上，把脑子里的事随手记下来，按重要/紧急分类，做完打勾划线沉底，一目了然。
 
 - 🪶 **轻**：整个数据存成一个本地 JSON 文件，无需登录、无需联网、无账号、无广告。
 - 🎯 **专注**：清爽的浅色界面，只做"个人待办"这一件事，不堆功能。
@@ -76,9 +76,9 @@ TaskList 是一款**为个人日常打造的桌面待办清单**。它默认贴�
 
 前往 [**Releases 页面**](https://github.com/KehuiPang/tasklist/releases) 下载适合你系统的最新安装包：
 
-- **Windows** — `TaskList-Setup-x.x.x.exe`
-- **macOS** — `.dmg`（Intel 与 Apple Silicon 双架构）
-- **Linux** — `.AppImage` / `.deb`
+- **Windows**：`TaskList-Setup-x.x.x.exe`
+- **macOS**：`.dmg`（Intel 与 Apple Silicon 双架构）
+- **Linux**：`.AppImage` / `.deb`
 
 ## 从源码运行 / 构建
 
@@ -116,11 +116,11 @@ Linux     ~/.config/tasklist/tasklist-data.json
 
 ## 技术栈
 
-- [Electron](https://www.electronjs.org/) — 桌面应用框架
-- 原生 HTML / CSS / JavaScript — 无重型前端框架，轻量直接
-- 本地 JSON 文件存储 — 零后端、零依赖服务
-- [electron-builder](https://www.electron.build/) — 打包 NSIS 安装包
-- GitHub Actions — 打 tag 自动构建并发布 Release
+- [Electron](https://www.electronjs.org/)：桌面应用框架
+- 原生 HTML / CSS / JavaScript：无重型前端框架，轻量直接
+- 本地 JSON 文件存储：零后端、零依赖服务
+- [electron-builder](https://www.electron.build/)：打包 NSIS 安装包
+- GitHub Actions：打 tag 自动构建并发布 Release
 
 ## 版本
 
