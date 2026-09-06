@@ -148,8 +148,8 @@ Released under the [MIT License](LICENSE) — free to use, modify, and distribut
 
 ## Made by the Wuwei team
 
-TaskList is a small tool built by the team behind **[Wuwei AI](https://wuweiai.io)** — a **free, open-source, local-first AI agent client**.
+TaskList is a small tool built by the team behind **[Wuwei AI](https://wuweiai.io)**, a **free, open-source, local-first AI agent client**.
 
-Think Claude Code or Cursor, but free, open-source, and model-agnostic: tell it what you want in one sentence and it reads/writes files, makes precise edits, runs commands, and searches the web to get the job done — every step behind a permission prompt. Switch between Claude / OpenAI / Chinese LLMs in one click; bring your own API key or use Wuwei's hosted credits (works free, even without login).
+Think Claude Code or Cursor, but free, open-source, and model-agnostic: tell it what you want in one sentence and it reads/writes files, makes precise edits, runs commands, and searches the web to get the job done, with every step behind a permission prompt. Switch between Claude / OpenAI / Chinese LLMs in one click; bring your own API key or use Wuwei's hosted credits (works free, even without login).
 
-👉 **[Try Wuwei AI — wuweiai.io](https://wuweiai.io)** · free & open source, Windows / macOS / Linux
+👉 **[Try Wuwei AI at wuweiai.io](https://wuweiai.io)** · free & open source, Windows / macOS / Linux

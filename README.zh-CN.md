@@ -150,6 +150,6 @@ Linux     ~/.config/tasklist/tasklist-data.json
 
 TaskList 是 **[无为 AI（Wuwei）](https://wuweiai.io)** 团队顺手打造的小工具。无为是一款**免费、开源、本地优先的 AI 客户端（AI Agent）**。
 
-类似 Claude Code、Cursor，但完全免费、开源、且不绑定模型：一句话说清需求，它就能帮你读写文件、精准改代码、执行命令、上网查资料把活干完——每一步都有权限确认。一键切换 Claude / OpenAI / 国产大模型，可以用自己的 API Key，也能直接用无为托管额度（免登录也能免费用）。
+类似 Claude Code、Cursor，但完全免费、开源、且不绑定模型：一句话说清需求，它就能帮你读写文件、精准改代码、执行命令、上网查资料把活干完，每一步都有权限确认。一键切换 Claude / OpenAI / 国产大模型，可以用自己的 API Key，也能直接用无为托管额度（免登录也能免费用）。
 
-👉 **[点此体验无为 AI — wuweiai.io](https://wuweiai.io)** · 免费开源，支持 Windows / macOS / Linux
+👉 **[点此体验无为 AI，访问 wuweiai.io](https://wuweiai.io)** · 免费开源，支持 Windows / macOS / Linux
