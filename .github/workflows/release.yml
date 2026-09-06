@@ -38,7 +38,51 @@ jobs:
       # 图标（build/tray-*.png、winicon-*.png、icon.ico、icon.png）已随仓库提交，
       # CI 直接使用，无需在 CI 里跑 Electron 渲染，更稳定跨平台。
 
-      - name: 构建并发布安装包
+      # mac / linux：直接打包并发布（无签名）
+      - name: 构建并发布安装包 (mac/linux)
+        if: matrix.platform != 'win'
         run: npx electron-builder --${{ matrix.platform }} --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false   # mac 无签名证书：跳过签名，产出未签名 dmg
+
+      # Windows 代码签名（EV Sign 云签名）：
+      #   配了 EVSIGN_KEY → 下载 evsign CLI，用 build/evsign.cjs 钩子在打包过程中逐个文件签名
+      #                     （在生成 latest.yml 之前签，保证 sha512 正确、自动更新不断链）；
+      #                     打包后强制验签，未签名/无效则中止发版（绝不发出以为已签的未签名包）。
+      #   没配 EVSIGN_KEY  → 打未签名包，行为与接入前完全一致，绝不破坏发版。
+      - name: 构建并发布安装包 (windows)
+        if: matrix.platform == 'win'
+        shell: pwsh
+        run: |
+          $common = @('--win', '--publish', 'always')
+          if ($env:EVSIGN_KEY) {
+            Write-Host 'EV Sign 已配置 -> 下载 CLI 并打云签名包'
+            $cli = Join-Path $env:RUNNER_TEMP 'evsign-client.exe'
+            # evsign.cn 在国内、GitHub runner 在境外，下载可能慢：给 120s 超时 + 重试一次
+            $ok = $false
+            foreach ($i in 1..2) {
+              try {
+                Invoke-WebRequest -Uri 'https://mc.evsign.cn/evsign-client-cli-windows-latest' -OutFile $cli -TimeoutSec 120 -UseBasicParsing
+                if ((Get-Item $cli).Length -gt 0) { $ok = $true; break }
+              } catch { Write-Host "download evsign-client attempt $i failed: $_" }
+            }
+            if (-not $ok) { Write-Error 'evsign-client CLI 下载失败，中止发版（避免发出未签名包）'; exit 1 }
+            $env:EVSIGN_CLIENT = $cli
+            npx electron-builder @common '-c.win.signtoolOptions.sign=build/evsign.cjs'
+            if ($LASTEXITCODE -ne 0) { Write-Error 'electron-builder 打包失败'; exit 1 }
+            # electron-builder 对"签名失败"只跳过不报错，会静默产出未签名包。
+            # 打包后强制验签：安装包必须是 Valid 签名，否则中止发版。
+            $setup = Get-ChildItem release\*-Setup-*.exe,dist\*-Setup-*.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+            if (-not $setup) { $setup = Get-ChildItem release\*.exe,dist\*.exe -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '*.blockmap' } | Select-Object -First 1 }
+            $sig = Get-AuthenticodeSignature $setup.FullName
+            Write-Host "验签 $($setup.Name): $($sig.Status)"
+            if ($sig.Status -ne 'Valid') { Write-Error "签名校验失败($($sig.Status))，中止发版"; exit 1 }
+            Write-Host "签名有效，签发者: $($sig.SignerCertificate.Subject)"
+          } else {
+            Write-Host '未配置 EVSIGN_KEY -> 打未签名包（行为同接入前）'
+            npx electron-builder @common
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVSIGN_KEY: ${{ secrets.EVSIGN_KEY }}
