@@ -9,19 +9,19 @@
     <!-- 渐变直角方块铺满（圆角由 round_mask.py 精确套上，保证四角对称） -->
     <rect x="0" y="0" width="256" height="256" fill="url(#g4)"/>
     <!-- 夹头 -->
-    <rect x="106" y="52" width="44" height="20" rx="9" fill="#cdd6dd"/>
-    <!-- 纸面 -->
-    <rect x="76" y="64" width="104" height="128" rx="20" fill="#F4F6F8"/>
-    <!-- 纸上清单：一个青勾 + 两行(圈+条) -->
+    <rect x="103" y="40" width="50" height="23" rx="10" fill="#cdd6dd"/>
+    <!-- 纸面：放大并居中(宽128 高152) -->
+    <rect x="64" y="54" width="128" height="152" rx="24" fill="#F4F6F8"/>
+    <!-- 纸上清单：一个青勾 + 两行(圈+条)，随纸面放大等比重排 -->
     <g stroke-linecap="round">
-      <path d="M92 104 l9 10 l17 -20" fill="none" stroke="#4e7a63" stroke-width="9" stroke-linejoin="round"/>
-      <rect x="128" y="100" width="36" height="9" rx="4.5" fill="#274A63" opacity="0.5"/>
-      <circle cx="100" cy="140" r="9" fill="none" stroke="#274A63" stroke-width="6.5"/>
-      <rect x="128" y="135" width="36" height="9" rx="4.5" fill="#274A63" opacity="0.85"/>
-      <circle cx="100" cy="170" r="9" fill="none" stroke="#274A63" stroke-width="6.5"/>
-      <rect x="128" y="165" width="26" height="9" rx="4.5" fill="#274A63" opacity="0.85"/>
+      <path d="M83 102 l11 12 l21 -25" fill="none" stroke="#4e7a63" stroke-width="11" stroke-linejoin="round"/>
+      <rect x="128" y="98" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.5"/>
+      <circle cx="94" cy="146" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
+      <rect x="128" y="140" width="44" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
+      <circle cx="94" cy="182" r="11" fill="none" stroke="#274A63" stroke-width="8"/>
+      <rect x="128" y="176" width="32" height="11" rx="5.5" fill="#274A63" opacity="0.85"/>
     </g>
     <!-- 夹头一点朱火种 -->
-    <circle cx="128" cy="62" r="6.5" fill="#C05F3C"/>
+    <circle cx="128" cy="51" r="8" fill="#C05F3C"/>
   </g>
 </svg>
