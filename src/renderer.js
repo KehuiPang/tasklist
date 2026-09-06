@@ -18,7 +18,7 @@ const PRIO_NAME = { get 3() { return t('prio_3'); }, get 2() { return t('prio_2'
 // ============ 初始化 ============
 async function init() {
   DATA = await window.api.loadData();
-  setLang(DATA.settings.language || 'zh-CN');
+  setLang(resolveLang(DATA.settings.language));
   applyI18nDOM();
   applySettingsToUI();
   currentFolderId = null;
@@ -377,7 +377,7 @@ function bindEvents() {
   $('btnImport').addEventListener('click', async () => {
     if (!confirm(t('confirm_import'))) return;
     const r = await window.api.importData();
-    if (r.ok) { DATA = r.data; setLang(DATA.settings.language || CUR_LANG); applyI18nDOM(); applySettingsToUI(); render(); alert(t('alert_imported')); }
+    if (r.ok) { DATA = r.data; setLang(resolveLang(DATA.settings.language)); applyI18nDOM(); applySettingsToUI(); render(); alert(t('alert_imported')); }
     else if (r.error) alert(t('alert_import_fail', r.error));
   });
   $('btnQuit').addEventListener('click', () => { if (confirm(t('confirm_quit'))) window.api.quit(); });

@@ -148,8 +148,21 @@ const I18N = {
   },
 };
 
+// 按系统语言判定：中文环境→zh-CN，其余→en
+function systemLang() {
+  try {
+    const loc = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+    return loc.startsWith('zh') ? 'zh-CN' : 'en';
+  } catch (e) { return 'en'; }
+}
+// 解析 settings.language：'en'/'zh-CN' 用固定值，其余(null/未设)跟随系统
+function resolveLang(lang) {
+  if (lang === 'en' || lang === 'zh-CN') return lang;
+  return systemLang();
+}
+
 let CUR_LANG = 'zh-CN';
-function setLang(lang) { CUR_LANG = I18N[lang] ? lang : 'zh-CN'; }
+function setLang(lang) { CUR_LANG = I18N[lang] ? lang : systemLang(); }
 function t(key, ...args) {
   const v = (I18N[CUR_LANG] || I18N['zh-CN'])[key];
   if (typeof v === 'function') return v(...args);

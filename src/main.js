@@ -26,7 +26,7 @@ const DEFAULT_DATA = {
     sortBy: 'priority',
     theme: 'light',
     alwaysOnTop: true,
-    language: 'zh-CN',
+    language: null,  // null = 跟随系统语言（首次启动时按 OS 语言判定中/英）
     windowBounds: null
   },
   folders: [],
@@ -48,8 +48,21 @@ const MAIN_I18N = {
     dlg_export: 'Export backup', dlg_import: 'Import backup',
   },
 };
-function curLang() { try { return (readData().settings.language === 'en') ? 'en' : 'zh-CN'; } catch (e) { return 'zh-CN'; } }
-function mt(key) { return (MAIN_I18N[curLang()] || MAIN_I18N['zh-CN'])[key] || key; }
+// 按操作系统语言判定：中文系统→zh-CN，其余→en
+function systemLang() {
+  try {
+    const loc = (app.getLocale() || '').toLowerCase();
+    return loc.startsWith('zh') ? 'zh-CN' : 'en';
+  } catch (e) { return 'en'; }
+}
+// 把 settings.language 解析成实际语言（null/未设 = 跟随系统）
+function resolveLang(lang) {
+  if (lang === 'en') return 'en';
+  if (lang === 'zh-CN') return 'zh-CN';
+  return systemLang();
+}
+function curLang() { try { return resolveLang(readData().settings.language); } catch (e) { return systemLang(); } }
+function mt(key) { return (MAIN_I18N[curLang()] || MAIN_I18N['en'])[key] || key; }
 
 function readData() {
   try {
