@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('api', {
   close: () => ipcRenderer.send('win-close'),
   quit: () => ipcRenderer.send('win-quit'),
   collapseNow: () => ipcRenderer.send('collapse-now'),
+  setLanguage: (lang) => ipcRenderer.send('set-language', lang),
 
   onCollapsedChange: (cb) => ipcRenderer.on('collapsed-change', (e, payload) => cb(payload))
 });

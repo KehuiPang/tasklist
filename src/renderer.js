@@ -6,21 +6,35 @@ let editingTaskId = null;
 const $ = (id) => document.getElementById(id);
 const uid = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
+// 四象限：名称随语言动态取（t('qname_XX')）
 const QUAD_INFO = {
-  IU: { name: '重要且紧急', cls: 'q-IU', order: 0 },
-  IN: { name: '重要不紧急', cls: 'q-IN', order: 1 },
-  NU: { name: '紧急不重要', cls: 'q-NU', order: 2 },
-  NN: { name: '不重要不紧急', cls: 'q-NN', order: 3 }
+  IU: { get name() { return t('qname_IU'); }, cls: 'q-IU', order: 0 },
+  IN: { get name() { return t('qname_IN'); }, cls: 'q-IN', order: 1 },
+  NU: { get name() { return t('qname_NU'); }, cls: 'q-NU', order: 2 },
+  NN: { get name() { return t('qname_NN'); }, cls: 'q-NN', order: 3 }
 };
-const PRIO_NAME = { 3: '紧急', 2: '高', 1: '中', 0: '低' };
+const PRIO_NAME = { get 3() { return t('prio_3'); }, get 2() { return t('prio_2'); }, get 1() { return t('prio_1'); }, get 0() { return t('prio_0'); } };
 
 // ============ 初始化 ============
 async function init() {
   DATA = await window.api.loadData();
+  setLang(DATA.settings.language || 'zh-CN');
+  applyI18nDOM();
   applySettingsToUI();
   currentFolderId = null;
   render();
   bindEvents();
+}
+
+// 切换语言：保存设置 + 重新翻译静态 DOM + 重渲染动态内容
+function changeLanguage(lang) {
+  setLang(lang);
+  DATA.settings.language = CUR_LANG;
+  persist();
+  if (window.api.setLanguage) window.api.setLanguage(CUR_LANG);
+  applyI18nDOM();
+  applySettingsToUI();
+  render();
 }
 
 function applySettingsToUI() {
@@ -35,6 +49,7 @@ function applySettingsToUI() {
   $('setAutoHide').checked = s.autoHide !== false;
   $('setAlwaysOnTop').checked = s.alwaysOnTop !== false;
   $('btnPin').classList.toggle('active', s.alwaysOnTop !== false);
+  if ($('setLanguage')) $('setLanguage').value = CUR_LANG;
 }
 
 let saveTimer = null;
@@ -138,7 +153,7 @@ function taskHtml(t, idx) {
 function renderList() {
   const list = sortTasks(activeTasks());
   const el = $('content');
-  if (!list.length) { el.innerHTML = '<div class="empty">还没有任务，上面记一条吧 ✍️</div>'; return; }
+  if (!list.length) { el.innerHTML = `<div class="empty">${t('empty_tasks')}</div>`; return; }
   el.innerHTML = list.map((t, i) => taskHtml(t, i + 1)).join('');
 }
 
@@ -151,7 +166,7 @@ function renderQuadrant() {
       <div class="qtask ${t.status === 'done' ? 'done' : ''}" data-id="${t.id}">
         <span class="qcheck" data-act="toggle"></span>
         <span data-act="edit">${escapeHtml(t.title)}</span>
-      </div>`).join('') || '<div class="empty" style="padding:8px;font-size:11px;">—</div>';
+      </div>`).join('') || `<div class="empty" style="padding:8px;font-size:11px;">${t('empty_dash')}</div>`;
     return `<div class="quad-cell">
       <h4><span class="qh-dot ${QUAD_INFO[q].cls}"></span>${QUAD_INFO[q].name}</h4>
       ${inner}
@@ -162,7 +177,7 @@ function renderQuadrant() {
   let unclass = '';
   if (unq.length) {
     unclass = `<div class="quad-cell" style="grid-column:1/3;">
-      <h4><span class="qh-dot q-NN"></span>未分类（点开设四象限）</h4>
+      <h4><span class="qh-dot q-NN"></span>${t('q_uncategorized')}</h4>
       ${unq.map(t => `<div class="qtask ${t.status==='done'?'done':''}" data-id="${t.id}">
         <span class="qcheck" data-act="toggle"></span><span data-act="edit">${escapeHtml(t.title)}</span></div>`).join('')}
     </div>`;
@@ -179,8 +194,8 @@ function renderTree() {
   const tasksHere = sortTasks(activeTasks().filter(t => t.folderId === currentFolderId));
 
   let html = `<div class="add-folder-row">
-      <input type="text" id="newFolderName" placeholder="新建子目录/项目…" />
-      <button class="mini-btn" id="btnAddFolder">+目录</button>
+      <input type="text" id="newFolderName" placeholder="${t('newfolder_ph')}" />
+      <button class="mini-btn" id="btnAddFolder">${t('btn_addfolder')}</button>
     </div>`;
 
   html += subFolders.map(f => {
@@ -190,8 +205,8 @@ function renderTree() {
       <span class="fname" data-act="open">${escapeHtml(f.name)}</span>
       <span class="fcount">${count}</span>
       <span class="tree-actions">
-        <button class="tb-btn" data-act="rename" title="重命名">✎</button>
-        <button class="tb-btn" data-act="delfolder" title="删除">🗑</button>
+        <button class="tb-btn" data-act="rename" title="${t('tip_rename')}">✎</button>
+        <button class="tb-btn" data-act="delfolder" title="${t('tip_delfolder')}">🗑</button>
       </span>
     </div>`;
   }).join('');
@@ -200,7 +215,7 @@ function renderTree() {
     html += tasksHere.map((t, i) => taskHtml(t, i + 1)).join('');
   }
   if (!subFolders.length && !tasksHere.length) {
-    html += '<div class="empty">这个目录还是空的<br/>上面新建子目录，或在顶部输入框加任务</div>';
+    html += `<div class="empty">${t('empty_folder')}</div>`;
   }
   el.innerHTML = html;
 }
@@ -210,7 +225,7 @@ function renderBreadcrumb() {
   const chain = [];
   let f = currentFolderId ? DATA.folders.find(x => x.id === currentFolderId) : null;
   while (f) { chain.unshift(f); f = f.parentId ? DATA.folders.find(x => x.id === f.parentId) : null; }
-  let html = `<a data-fid="">🏠 全部</a>`;
+  let html = `<a data-fid="">🏠 ${t('all')}</a>`;
   chain.forEach(c => { html += ` / <a data-fid="${c.id}">${escapeHtml(c.name)}</a>`; });
   bc.innerHTML = html;
 }
@@ -240,7 +255,7 @@ function renderDeferred() {
   $('deferredCount').textContent = deferred.length;
   const el = $('deferredList');
   if (el.classList.contains('hidden')) return;
-  if (!deferred.length) { el.innerHTML = '<div class="empty" style="padding:10px;">没有搁置的事</div>'; return; }
+  if (!deferred.length) { el.innerHTML = `<div class="empty" style="padding:10px;">${t('empty_deferred')}</div>`; return; }
   el.innerHTML = deferred.map((t, i) => taskHtml(t, i + 1)).join('');
 }
 
@@ -255,12 +270,12 @@ function addFolder(name) {
 function renameFolder(fid) {
   const f = DATA.folders.find(x => x.id === fid);
   if (!f) return;
-  const name = prompt('重命名目录', f.name);
+  const name = prompt(t('prompt_rename'), f.name);
   if (name && name.trim()) { f.name = name.trim(); persist(); render(); }
 }
 function deleteFolder(fid) {
   const count = countTasksInFolder(fid);
-  if (count > 0 && !confirm(`该目录（含子目录）下有 ${count} 个任务，删除目录会把这些任务移到「全部」。确定？`)) return;
+  if (count > 0 && !confirm(t('confirm_delfolder', count))) return;
   // 收集子目录
   const childIds = [fid];
   let changed = true;
@@ -273,26 +288,26 @@ function deleteFolder(fid) {
 
 // ============ 任务编辑弹层 ============
 function openTaskEdit(id) {
-  const t = DATA.tasks.find(x => x.id === id);
-  if (!t) return;
+  const task = DATA.tasks.find(x => x.id === id);
+  if (!task) return;
   editingTaskId = id;
-  $('editTitle').value = t.title;
-  $('editQuadrant').value = t.quadrant || '';
-  $('editPriority').value = String(t.priority);
+  $('editTitle').value = task.title;
+  $('editQuadrant').value = task.quadrant || '';
+  $('editPriority').value = String(task.priority);
   // 目录下拉
   const sel = $('editFolder');
-  sel.innerHTML = '<option value="">（无 / 全部）</option>' +
+  sel.innerHTML = `<option value="">${t('folder_none')}</option>` +
     DATA.folders.map(f => `<option value="${f.id}">${escapeHtml(folderPath(f.id))}</option>`).join('');
-  sel.value = t.folderId || '';
+  sel.value = task.folderId || '';
   $('taskModal').classList.remove('hidden');
 }
 function saveTaskEdit() {
-  const t = DATA.tasks.find(x => x.id === editingTaskId);
-  if (!t) return;
-  t.title = $('editTitle').value.trim() || t.title;
-  t.quadrant = $('editQuadrant').value;
-  t.priority = parseInt($('editPriority').value, 10);
-  t.folderId = $('editFolder').value || null;
+  const task = DATA.tasks.find(x => x.id === editingTaskId);
+  if (!task) return;
+  task.title = $('editTitle').value.trim() || task.title;
+  task.quadrant = $('editQuadrant').value;
+  task.priority = parseInt($('editPriority').value, 10);
+  task.folderId = $('editFolder').value || null;
   persist();
   $('taskModal').classList.add('hidden');
   render();
@@ -342,7 +357,8 @@ function bindEvents() {
   $('deferredBar').addEventListener('click', () => {
     const el = $('deferredList');
     el.classList.toggle('hidden');
-    $('deferredToggle').firstChild.textContent = el.classList.contains('hidden') ? '▸ 暂缓搁置 (' : '▾ 暂缓搁置 (';
+    // 只切换首个箭头符号（▸/▾），中间文案由 data-i18n 管
+    $('deferredToggle').firstChild.textContent = el.classList.contains('hidden') ? '▸ ' : '▾ ';
     renderDeferred();
   });
 
@@ -357,19 +373,21 @@ function bindEvents() {
     await window.api.setAlwaysOnTop(e.target.checked);
     $('btnPin').classList.toggle('active', e.target.checked);
   });
-  $('btnExport').addEventListener('click', async () => { const r = await window.api.exportData(); if (r.ok) alert('已导出：' + r.filePath); });
+  $('btnExport').addEventListener('click', async () => { const r = await window.api.exportData(); if (r.ok) alert(t('alert_exported', r.filePath)); });
   $('btnImport').addEventListener('click', async () => {
-    if (!confirm('导入会覆盖当前所有数据，确定？')) return;
+    if (!confirm(t('confirm_import'))) return;
     const r = await window.api.importData();
-    if (r.ok) { DATA = r.data; applySettingsToUI(); render(); alert('导入成功'); }
-    else if (r.error) alert('导入失败：' + r.error);
+    if (r.ok) { DATA = r.data; setLang(DATA.settings.language || CUR_LANG); applyI18nDOM(); applySettingsToUI(); render(); alert(t('alert_imported')); }
+    else if (r.error) alert(t('alert_import_fail', r.error));
   });
-  $('btnQuit').addEventListener('click', () => { if (confirm('退出程序？')) window.api.quit(); });
+  $('btnQuit').addEventListener('click', () => { if (confirm(t('confirm_quit'))) window.api.quit(); });
+  // 语言切换
+  if ($('setLanguage')) $('setLanguage').addEventListener('change', e => changeLanguage(e.target.value));
 
   // 任务编辑弹层
   $('btnCloseTask').addEventListener('click', () => $('taskModal').classList.add('hidden'));
   $('btnSaveTask').addEventListener('click', saveTaskEdit);
-  $('btnDeleteTask').addEventListener('click', () => { if (confirm('删除这个任务？')) { deleteTask(editingTaskId); $('taskModal').classList.add('hidden'); } });
+  $('btnDeleteTask').addEventListener('click', () => { if (confirm(t('confirm_deltask'))) { deleteTask(editingTaskId); $('taskModal').classList.add('hidden'); } });
   $('btnDeferTask').addEventListener('click', () => { setStatus(editingTaskId, 'deferred'); $('taskModal').classList.add('hidden'); });
   $('btnActivateTask').addEventListener('click', () => { setStatus(editingTaskId, 'todo'); $('taskModal').classList.add('hidden'); });
 

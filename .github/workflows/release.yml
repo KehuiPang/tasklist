@@ -1,6 +1,6 @@
 name: Release
 
-# 打 tag（v1.0.0 这种）时自动触发：构建 Windows 安装包并发布到 GitHub Releases
+# 打 tag（v1.0.0 这种）时自动触发：三平台并行构建并发布到 GitHub Releases
 on:
   push:
     tags:
@@ -10,8 +10,18 @@ permissions:
   contents: write   # 允许创建 Release、上传产物
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -23,12 +33,12 @@ jobs:
           cache: npm
 
       - name: 安装依赖
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
-      # 图标（build/tray-*.png、winicon-*.png、icon.ico）已随仓库提交，CI 直接使用，
-      # 无需在 CI 里跑 Electron 渲染，更稳定。
+      # 图标（build/tray-*.png、winicon-*.png、icon.ico、icon.png）已随仓库提交，
+      # CI 直接使用，无需在 CI 里跑 Electron 渲染，更稳定跨平台。
 
       - name: 构建并发布安装包
-        run: npx electron-builder --win --x64 --publish always
+        run: npx electron-builder --${{ matrix.platform }} --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

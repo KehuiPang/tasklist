@@ -6,7 +6,7 @@ const path = require('path');
 const SVG = fs.readFileSync(path.join(__dirname, '..', 'build', 'tray.svg'), 'utf-8');
 const OUT_DIR = path.join(__dirname, '..', 'build');
 const TRAY_SIZES = [16, 24, 32];
-const WIN_SIZES = [256, 128, 64, 48, 32, 16]; // 窗口/任务栏铺满图标 + 合成 ico
+const WIN_SIZES = [512, 256, 128, 64, 48, 32, 16]; // 窗口/任务栏铺满图标 + 合成 ico（512 供 mac/linux）
 const R = 512; // 渲染画布（大一点更清晰）
 
 function svgAt(size) {
@@ -34,82 +34,55 @@ function buildIco(pngs) {
 app.disableHardwareAcceleration();
 
 app.whenReady().then(async () => {
-  const win = new BrowserWindow({
-    width: R, height: R, show: false,
-    transparent: true, frame: false, backgroundColor: '#00000000'
-  });
+  // 直角实心方块铺满画布，不透明背景截图最稳；圆角由 round_mask.py 精确套上
+  const win = new BrowserWindow({ width: R, height: R, show: false });
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    html,body{margin:0;padding:0;background:rgba(0,0,0,0)}
-    #box{position:absolute;left:0;top:0}
-    </style></head><body><div id="box">${svgAt(R)}</div></body></html>`;
+    html,body{margin:0;padding:0;background:#1B2530;width:${R}px;height:${R}px;overflow:hidden}
+    svg{display:block;width:${R}px;height:${R}px}
+    </style></head><body>${svgAt(R)}</body></html>`;
   const tmp = path.join(OUT_DIR, '_tmp_tray.html');
   fs.writeFileSync(tmp, html, 'utf-8');
   await win.loadFile(tmp);
-  await new Promise(r => setTimeout(r, 700));
+  await new Promise(r => setTimeout(r, 500));
 
-  const shot = await win.webContents.capturePage({ x: 0, y: 0, width: R, height: R });
+  // 方块铺满整幅，直接截整幅（内容 = 整张画布）
+  const cropped = await win.webContents.capturePage({ x: 0, y: 0, width: R, height: R });
 
-  // 取位图，泛洪清背景残影 + 求内容边界框
-  const { width: w, height: h } = shot.getSize();
-  const bmp = shot.toBitmap(); // BGRA
-  const idx = (x, y) => (y * w + x) * 4;
-  const isDark = (x, y) => {
-    const i = idx(x, y);
-    return (0.299 * bmp[i + 2] + 0.587 * bmp[i + 1] + 0.114 * bmp[i]) < 160;
-  };
-  // 泛洪从四角清亮色背景 → 透明(RGB深墨)
-  const visited = new Uint8Array(w * h);
-  const stack = [];
-  for (let x = 0; x < w; x++) { stack.push([x, 0]); stack.push([x, h - 1]); }
-  for (let y = 0; y < h; y++) { stack.push([0, y]); stack.push([w - 1, y]); }
-  while (stack.length) {
-    const [x, y] = stack.pop();
-    if (x < 0 || y < 0 || x >= w || y >= h) continue;
-    const p = y * w + x;
-    if (visited[p]) continue;
-    visited[p] = 1;
-    if (isDark(x, y)) continue;
-    const i = idx(x, y);
-    bmp[i] = 0x30; bmp[i + 1] = 0x25; bmp[i + 2] = 0x1B; bmp[i + 3] = 0;
-    stack.push([x + 1, y]); stack.push([x - 1, y]); stack.push([x, y + 1]); stack.push([x, y - 1]);
-  }
-
-  // 求非透明内容边界框
-  let minX = w, minY = h, maxX = -1, maxY = -1;
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    if (bmp[idx(x, y) + 3] > 40) {
-      if (x < minX) minX = x; if (x > maxX) maxX = x;
-      if (y < minY) minY = y; if (y > maxY) maxY = y;
-    }
-  }
-  const cw = maxX - minX + 1, ch = maxY - minY + 1;
-  console.log(`content box: x[${minX}~${maxX}] y[${minY}~${maxY}] = ${cw}x${ch}`);
-
-  const clean = nativeImage.createFromBuffer(bmp, { width: w, height: h });
-  // 精确裁剪到内容框（正方形，取最大边居中）
-  const side = Math.max(cw, ch);
-  const cropX = Math.max(0, minX - Math.floor((side - cw) / 2));
-  const cropY = Math.max(0, minY - Math.floor((side - ch) / 2));
-  const cropped = clean.crop({ x: cropX, y: cropY, width: side, height: side });
-
-  // 托盘图标
+  // 先输出直角方块 png（托盘 + 窗口）
+  const allFiles = [];
   for (const s of TRAY_SIZES) {
-    const buf = cropped.resize({ width: s, height: s, quality: 'best' }).toPNG();
-    fs.writeFileSync(path.join(OUT_DIR, `tray-${s}.png`), buf);
-    console.log('tray', s);
+    const p = path.join(OUT_DIR, `tray-${s}.png`);
+    fs.writeFileSync(p, cropped.resize({ width: s, height: s, quality: 'best' }).toPNG());
+    allFiles.push(p); console.log('tray', s);
   }
-  // 窗口/任务栏铺满图标 + 合成 ico
-  const winPngs = [];
   for (const s of WIN_SIZES) {
-    const buf = cropped.resize({ width: s, height: s, quality: 'best' }).toPNG();
-    fs.writeFileSync(path.join(OUT_DIR, `winicon-${s}.png`), buf);
-    winPngs.push({ size: s, buf });
-    console.log('winicon', s);
+    const p = path.join(OUT_DIR, `winicon-${s}.png`);
+    fs.writeFileSync(p, cropped.resize({ width: s, height: s, quality: 'best' }).toPNG());
+    allFiles.push(p); console.log('winicon', s);
   }
-  // 合成 ico（复用 ico 打包逻辑）
-  fs.writeFileSync(path.join(OUT_DIR, 'icon.ico'), buildIco(winPngs));
-  console.log('icon.ico written');
   win.destroy();
   try { fs.unlinkSync(tmp); } catch (e) {}
+
+  // 用 Python 精确套圆角 mask（保证四角对称 + 留透明边距防深色任务栏贴边露白）
+  const { spawnSync } = require('child_process');
+  const pyCmd = process.platform === 'win32' ? 'py' : 'python3';
+  const mask = path.join(__dirname, 'round_mask.py');
+  const trayFiles = TRAY_SIZES.map((s) => path.join(OUT_DIR, `tray-${s}.png`));
+  const winFiles = WIN_SIZES.map((s) => path.join(OUT_DIR, `winicon-${s}.png`));
+  // 托盘 + 窗口图标：统一标准圆角(0.2)，铺满无白边，好看
+  const r1 = spawnSync(pyCmd, [mask, '--pad=0', '--radius=0.2', ...trayFiles], { encoding: 'utf-8' });
+  const r2 = spawnSync(pyCmd, [mask, '--pad=0', '--radius=0.2', ...winFiles], { encoding: 'utf-8' });
+  for (const [tag, r] of [['tray', r1], ['winicon', r2]]) {
+    if (r.status === 0) console.log(`圆角 mask 已套用(${tag})\n` + (r.stdout || ''));
+    else console.log(`⚠ 圆角 mask 失败(${tag}, 保持直角):`, (r.stderr || r.error || '').toString());
+  }
+
+  // 用套好圆角的 winicon 重新合成 ico（ico 规范最大 256，排除 512）
+  const winPngs = WIN_SIZES.filter((s) => s <= 256).map((s) => ({ size: s, buf: fs.readFileSync(path.join(OUT_DIR, `winicon-${s}.png`)) }));
+  fs.writeFileSync(path.join(OUT_DIR, 'icon.ico'), buildIco(winPngs));
+  console.log('icon.ico written (圆角)');
+  // mac/linux 用的通用大图标：icon.png（512，electron-builder 自动转 icns / 图标集）
+  fs.copyFileSync(path.join(OUT_DIR, 'winicon-512.png'), path.join(OUT_DIR, 'icon.png'));
+  console.log('icon.png (512) written');
   app.quit();
 });

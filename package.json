@@ -15,7 +15,11 @@
   },
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win --x64"
+    "icons": "electron scripts/gen-tray.js",
+    "dist": "electron-builder --win --x64",
+    "dist:win": "electron-builder --win --x64",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
   },
   "build": {
     "appId": "com.wuwei.tasklist",
@@ -34,7 +38,9 @@
       "build/winicon-64.png",
       "build/winicon-128.png",
       "build/winicon-256.png",
+      "build/winicon-512.png",
       "build/icon.ico",
+      "build/icon.png",
       "package.json"
     ],
     "win": {
@@ -46,6 +52,25 @@
       ],
       "icon": "build/icon.ico",
       "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.png",
+      "category": "Utility",
+      "maintainer": "KehuiPang <pangkehui4258@gmail.com>",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
     "publish": {
       "provider": "github",

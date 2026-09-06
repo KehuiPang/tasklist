@@ -2,6 +2,9 @@ const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage, nativeThem
 const path = require('path');
 const fs = require('fs');
 
+// 兜底：主进程未捕获异常时不弹「A JavaScript error occurred」崩溃框，仅记录日志，保证托盘常驻不挂
+process.on('uncaughtException', (err) => { console.error('[TaskList] uncaughtException:', err && err.stack || err); });
+
 const DATA_DIR = app.getPath('userData');
 const DATA_FILE = path.join(DATA_DIR, 'tasklist-data.json');
 
@@ -23,11 +26,30 @@ const DEFAULT_DATA = {
     sortBy: 'priority',
     theme: 'light',
     alwaysOnTop: true,
+    language: 'zh-CN',
     windowBounds: null
   },
   folders: [],
   tasks: []
 };
+
+// ---------- 主进程国际化（托盘菜单 / 托盘提示 / 备份对话框） ----------
+const MAIN_I18N = {
+  'zh-CN': {
+    tray_show: '显示主窗口', tray_untop: '取消置顶', tray_top: '窗口置顶',
+    tray_collapse: '贴边收起', tray_quit: '退出',
+    tray_tip: 'TaskList · 任务清单',
+    dlg_export: '导出备份', dlg_import: '导入备份',
+  },
+  'en': {
+    tray_show: 'Show window', tray_untop: 'Unpin', tray_top: 'Pin on top',
+    tray_collapse: 'Snap to edge', tray_quit: 'Quit',
+    tray_tip: 'TaskList',
+    dlg_export: 'Export backup', dlg_import: 'Import backup',
+  },
+};
+function curLang() { try { return (readData().settings.language === 'en') ? 'en' : 'zh-CN'; } catch (e) { return 'zh-CN'; } }
+function mt(key) { return (MAIN_I18N[curLang()] || MAIN_I18N['zh-CN'])[key] || key; }
 
 function readData() {
   try {
@@ -112,6 +134,17 @@ function createWindow() {
   // 鼠标进出：处理贴边展开/收起
   win.on('blur', () => scheduleCollapse());
   win.on('focus', () => expandIfCollapsed());
+
+  // 关闭窗口（任务栏右键关闭 / Alt+F4 / 关闭按钮）时不销毁，只隐藏，程序常驻托盘。
+  // 只有真正退出（app.isQuitting）时才允许销毁。
+  win.on('close', (e) => {
+    if (!app.isQuitting) {
+      e.preventDefault();
+      collapsed = false;
+      stopEdgeWatch();
+      win.hide();
+    }
+  });
 }
 
 let saveTimer = null;
@@ -226,7 +259,16 @@ function loadTrayIcon() {
   return nativeImage.createEmpty();
 }
 
+// 安全地显示主窗口：若已被销毁则重建
+function showMainWindow() {
+  if (!win || win.isDestroyed()) { createWindow(); }
+  if (collapsed) { doExpand(); return; }
+  win.show();
+  win.focus();
+}
+
 function toggleTop() {
+  if (!win || win.isDestroyed()) return;
   const on = !win.isAlwaysOnTop();
   win.setAlwaysOnTop(on, 'screen-saver');
   const d = readData(); d.settings.alwaysOnTop = on; writeData(d);
@@ -237,16 +279,16 @@ function toggleTop() {
 let trayMenu = null;
 
 function trayMenuItems() {
-  const onTop = win && win.isAlwaysOnTop();
+  const onTop = win && !win.isDestroyed() && win.isAlwaysOnTop();
   return [
-    { id: 'show', label: '显示主窗口',
+    { id: 'show', label: mt('tray_show'),
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>' },
-    { id: 'top', label: onTop ? '取消置顶' : '窗口置顶',
+    { id: 'top', label: onTop ? mt('tray_untop') : mt('tray_top'),
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>' },
-    { id: 'collapse', label: '贴边收起',
+    { id: 'collapse', label: mt('tray_collapse'),
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3v18"/><path d="m10 15-3-3 3-3"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>' },
     { id: 'sep' },
-    { id: 'quit', label: '退出', danger: true,
+    { id: 'quit', label: mt('tray_quit'), danger: true,
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v8"/><path d="M6.3 7.3a8 8 0 1 0 11.4 0"/></svg>' }
   ];
 }
@@ -320,7 +362,7 @@ function ensureTrayMenu() {
     e.preventDefault();
     const act = url.slice('tl-tray:'.length).replace(/\/+$/, '');
     trayMenu.hide();
-    if (act === 'show') { if (collapsed) doExpand(); win.show(); win.focus(); }
+    if (act === 'show') { showMainWindow(); }
     else if (act === 'top') { toggleTop(); }
     else if (act === 'collapse') { doCollapse(); }
     else if (act === 'quit') { app.isQuitting = true; app.quit(); }
@@ -347,10 +389,10 @@ function popupTrayMenu() {
 
 function createTray() {
   tray = new Tray(loadTrayIcon());
-  tray.setToolTip('TaskList · 任务清单');
+  tray.setToolTip(mt('tray_tip'));
   // 左键单击：显示/展开；右键：自绘菜单
-  tray.on('click', () => { if (collapsed) doExpand(); else { win.show(); win.focus(); } });
-  tray.on('double-click', () => { if (collapsed) doExpand(); else { win.show(); win.focus(); } });
+  tray.on('click', showMainWindow);
+  tray.on('double-click', showMainWindow);
   tray.on('right-click', popupTrayMenu);
 }
 
@@ -368,12 +410,16 @@ ipcMain.on('win-minimize', () => { if (win) win.minimize(); });
 ipcMain.on('win-close', () => { if (win) win.hide(); });
 ipcMain.on('win-quit', () => { app.isQuitting = true; app.quit(); });
 ipcMain.on('collapse-now', () => doCollapse());
+ipcMain.on('set-language', (e, lang) => {
+  const d = readData(); d.settings.language = (lang === 'en') ? 'en' : 'zh-CN'; writeData(d);
+  if (tray) tray.setToolTip(mt('tray_tip'));  // 托盘菜单每次弹出时重新构建，自动用新语言
+});
 
 // 导出 / 导入 备份
 const { dialog } = require('electron');
 ipcMain.handle('export-data', async () => {
   const { canceled, filePath } = await dialog.showSaveDialog(win, {
-    title: '导出备份',
+    title: mt('dlg_export'),
     defaultPath: `tasklist-backup-${Date.now()}.json`,
     filters: [{ name: 'JSON', extensions: ['json'] }]
   });
@@ -383,7 +429,7 @@ ipcMain.handle('export-data', async () => {
 });
 ipcMain.handle('import-data', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog(win, {
-    title: '导入备份',
+    title: mt('dlg_import'),
     filters: [{ name: 'JSON', extensions: ['json'] }],
     properties: ['openFile']
   });
@@ -403,9 +449,7 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
-    if (win) { if (collapsed) doExpand(); win.show(); win.focus(); }
-  });
+  app.on('second-instance', () => { showMainWindow(); });
 
   app.whenReady().then(() => {
     createWindow();
