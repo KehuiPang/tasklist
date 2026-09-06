@@ -15,6 +15,10 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-274a63.svg)](https://github.com/KehuiPang/tasklist/releases)
 [![Built with Electron](https://img.shields.io/badge/Electron-32-1b2530.svg)](https://www.electronjs.org/)
 
+<br/>
+
+<img src="assets/demo.gif?v=1" width="300" alt="TaskList 演示" />
+
 </div>
 
 ---
